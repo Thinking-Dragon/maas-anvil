@@ -122,10 +122,10 @@ def prepare_node_script(additional_dependency: tuple) -> None:
     console.print(script, soft_wrap=True)
 
 def _try_parse_dependency(raw_dependency: str) -> tuple[str]:
-    nb_expected_tokens = 2
+    NB_EXPECTED_TOKENS = 2
     tokens = raw_dependency.split(':')
 
-    if len(tokens) != nb_expected_tokens:
+    if len(tokens) != NB_EXPECTED_TOKENS:
         raise Exception(f"Additional dependency \"{raw_dependency}\" is badly formatted. Should be: `snap-name:snap-channel`.")
 
     name = tokens[0]
