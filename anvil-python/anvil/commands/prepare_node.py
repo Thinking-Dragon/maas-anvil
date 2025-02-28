@@ -105,9 +105,9 @@ sudo snap install --channel {CANDID_CHANNEL} candid
 def prepare_node_script(include_candid: bool) -> None:
     """Generates a script to prepare the node for use with MAAS Anvil.
     This must be run on every node on which you want to use MAAS Anvil."""
-    PREPARE_NODE_SCRIPT = PREPARE_NODE_TEMPLATE
+    script = PREPARE_NODE_TEMPLATE
 
     if include_candid:
-        PREPARE_NODE_SCRIPT += INCLUDE_CANDID_TEMPLATE
+        script += INCLUDE_CANDID_TEMPLATE
 
-    console.print(PREPARE_NODE_SCRIPT, soft_wrap=True)
+    console.print(script, soft_wrap=True)
