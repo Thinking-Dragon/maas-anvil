@@ -109,12 +109,26 @@ def prepare_node_script(additional_dependency: tuple) -> None:
         script += '\n'
 
         for raw_dependency in dependencies:
-            tokens = raw_dependency.split(':')
+            try:
+                name, channel = _try_parse_dependency(raw_dependency)
 
-            name = tokens[0]
-            channel = tokens[1]
+                script += f"# Install the {name} snap\n"
+                script += f"sudo snap install --channel {channel} {name}\n\n"
 
-            script += f"# Install the {name} snap\n"
-            script += f"sudo snap install --channel {channel} {name}\n\n"
+            except Exception as error_message:
+                console.print(error_message)
+                return
 
     console.print(script, soft_wrap=True)
+
+def _try_parse_dependency(raw_dependency: str) -> tuple[str]:
+    nb_expected_tokens = 2
+    tokens = raw_dependency.split(':')
+
+    if len(tokens) != nb_expected_tokens:
+        raise Exception(f"Additional dependency \"{raw_dependency}\" is badly formatted. Should be: `snap-name:snap-channel`.")
+
+    name = tokens[0]
+    channel = tokens[1]
+
+    return name, channel
