@@ -93,7 +93,28 @@ sudo snap connect maas-anvil:dot-config-anvil
     maas-anvil prepare-node-script | bash -x
     """,
 )
-def prepare_node_script() -> None:
+@click.option(
+    '--additional-dependency',
+    required=False,
+    multiple=True,
+    help='Include additional snap dependency, format: `snap-name:snap-channel`'
+)
+def prepare_node_script(additional_dependency: tuple) -> None:
     """Generates a script to prepare the node for use with MAAS Anvil.
     This must be run on every node on which you want to use MAAS Anvil."""
-    console.print(PREPARE_NODE_TEMPLATE, soft_wrap=True)
+    script = PREPARE_NODE_TEMPLATE
+
+    dependencies = additional_dependency # Alias because the argument must match the option name
+    if dependencies:
+        script += '\n'
+
+        for raw_dependency in dependencies:
+            tokens = raw_dependency.split(':')
+
+            name = tokens[0]
+            channel = tokens[1]
+
+            script += f"# Install the {name} snap\n"
+            script += f"sudo snap install --channel {channel} {name}\n\n"
+
+    console.print(script, soft_wrap=True)
