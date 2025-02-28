@@ -22,6 +22,7 @@ console = Console()
 
 
 JUJU_CHANNEL = "3.4/stable"
+CANDID_CHANNEL = "latest/stable"
 SUPPORTED_RELEASE = "jammy"
 
 PREPARE_NODE_TEMPLATE = f"""#!/bin/bash
@@ -83,6 +84,10 @@ sudo snap connect maas-anvil:dot-local-share-juju
 sudo snap connect maas-anvil:dot-config-anvil
 """
 
+INCLUDE_CANDID_TEMPLATE = f"""
+# Install the Candid snap
+sudo snap install --channel {CANDID_CHANNEL} candid
+"""
 
 @click.command(
     cls=FormatEpilogCommand,
@@ -93,7 +98,16 @@ sudo snap connect maas-anvil:dot-config-anvil
     maas-anvil prepare-node-script | bash -x
     """,
 )
-def prepare_node_script() -> None:
+@click.option(
+    '--include-candid',
+    is_flag=True,
+    help="Include Candid in the preparation script")
+def prepare_node_script(include_candid: bool) -> None:
     """Generates a script to prepare the node for use with MAAS Anvil.
     This must be run on every node on which you want to use MAAS Anvil."""
-    console.print(PREPARE_NODE_TEMPLATE, soft_wrap=True)
+    PREPARE_NODE_SCRIPT = PREPARE_NODE_TEMPLATE
+
+    if include_candid:
+        PREPARE_NODE_SCRIPT += INCLUDE_CANDID_TEMPLATE
+
+    console.print(PREPARE_NODE_SCRIPT, soft_wrap=True)
